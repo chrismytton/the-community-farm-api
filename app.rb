@@ -3,9 +3,10 @@ require 'rss'
 require 'open-uri'
 require 'json'
 require 'date'
+require 'uri'
 
 $morph_api_key = ENV['MORPH_API_KEY']
-$api_url = "https://api.morph.io/hecticjeff/community-farm/data.json?key=#{$morph_api_key}&query=select%20*%20from%20%27data%27%20order%20by%20date%20desc%20limit%2010"
+$api_url = "https://api.morph.io/hecticjeff/community-farm/data.json?key=#{URI.encode_www_form_component($morph_api_key)}&query=select%20*%20from%20%27data%27%20order%20by%20date%20desc%20limit%2010"
 $url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
 
 get '/' do
