@@ -19,7 +19,7 @@ get '/' do
 
     response.each do |week|
       maker.items.new_item do |item|
-        item.id = $url + '#' + week['date']
+        item.id = week['id']
         item.link = $url
         item.title = "Veg No Potatoes #{week['date']}"
         item.content.content = week['contents'].gsub("\n", '<br>')
