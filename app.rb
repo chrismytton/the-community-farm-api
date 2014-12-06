@@ -14,17 +14,14 @@ get '/' do
   rss = RSS::Maker.make('atom') do |maker|
     maker.channel.id = $url
     maker.channel.author = 'Community Farm'
-    maker.channel.updated = Time.now.to_s
-    # maker.channel.about = 'http://www.ruby-lang.org/en/feeds/news.rss'
+    maker.channel.updated = DateTime.parse(response[0]['date']).iso8601
     maker.channel.title = 'Community Farm - Veg No Potatoes'
 
-
     response.each do |week|
-      puts(week)
       maker.items.new_item do |item|
         item.id = $url + '#' + week['date']
         item.link = $url
-        item.title = 'Veg No Potatoes'
+        item.title = "Veg No Potatoes #{week['date']}"
         item.content.content = week['contents'].gsub("\n", '<br>')
         item.updated = DateTime.parse(week['date']).iso8601
       end
