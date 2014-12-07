@@ -5,22 +5,27 @@ require 'json'
 require 'date'
 require 'uri'
 
-$morph_api_key = ENV['MORPH_API_KEY']
-$api_url = "https://api.morph.io/hecticjeff/community-farm/data.json?key=#{URI.encode_www_form_component($morph_api_key)}&query=select%20*%20from%20%27data%27%20order%20by%20date%20desc%20limit%2010"
-$url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
+def morph(sql, api_key=ENV['MORPH_API_KEY'])
+  url = URI::HTTPS.build(
+    host: 'api.morph.io',
+    path: '/hecticjeff/community-farm/data.json',
+    query: URI.encode_www_form(query: sql, key: api_key)
+  )
+  JSON.parse(open(url).read)
+end
 
 get '/' do
-  response = JSON.parse(open($api_url).read)
+  url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
+  response = morph("select * from 'data' order by date desc limit 10")
   rss = RSS::Maker.make('atom') do |maker|
-    maker.channel.id = $url
+    maker.channel.id = url
     maker.channel.author = 'Community Farm'
-    maker.channel.updated = DateTime.parse(response[0]['date']).iso8601
+    maker.channel.updated = DateTime.parse(response.first['date']).iso8601
     maker.channel.title = 'Community Farm - Veg No Potatoes'
-
     response.each do |week|
       maker.items.new_item do |item|
         item.id = week['id']
-        item.link = $url
+        item.link = url
         item.title = "Veg No Potatoes #{week['date']}"
         item.content.content = week['contents'].gsub("\n", '<br>')
         item.updated = DateTime.parse(week['date']).iso8601
