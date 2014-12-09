@@ -16,18 +16,20 @@ end
 
 get '/' do
   url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
-  response = morph("select * from 'data' order by date desc limit 10")
+  query = "select * from 'data' where title = 'Veg No Potatoes Small'" +
+    " order by date desc limit 10"
+  response = morph(query)
   rss = RSS::Maker.make('atom') do |maker|
     maker.channel.id = url
     maker.channel.author = 'Community Farm'
     maker.channel.updated = DateTime.parse(response.first['date']).iso8601
-    maker.channel.title = 'Community Farm - Veg No Potatoes'
+    maker.channel.title = response.first['title']
     response.each do |week|
       maker.items.new_item do |item|
         item.id = week['id']
         item.link = url
-        item.title = "Veg No Potatoes #{week['date']}"
-        item.content.content = week['contents'].gsub("\n", '<br>')
+        item.title = "#{week['title']} #{week['date']}"
+        item.content.content = week['items'].gsub("\n", '<br>')
         item.updated = DateTime.parse(week['date']).iso8601
       end
     end
