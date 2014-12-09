@@ -29,7 +29,8 @@ get '/boxes' do
   content_type :json
   boxes = morph("select distinct title from data")
   boxes_with_urls = boxes.map do |box|
-    box['url'] = url("/boxes/#{URI.encode_www_form_component(box['title'])}")
+    box['xml_url'] = url("/boxes/#{URI.encode_www_form_component(box['title'])}.xml")
+    box['json_url'] = url("/boxes/#{URI.encode_www_form_component(box['title'])}.json")
     box
   end
   boxes_with_urls.to_json
