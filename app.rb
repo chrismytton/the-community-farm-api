@@ -14,11 +14,16 @@ def morph(sql, api_key=ENV['MORPH_API_KEY'])
   JSON.parse(open(url).read)
 end
 
-def get_box(type)
+def get_box_type(type)
   box_type = URI.decode_www_form_component(type)
   query = "select * from 'data' where title = '#{box_type}'" +
     " order by date desc limit 10"
   morph(query)
+end
+
+def get_box(id)
+  query = "select * from data where id = '#{id}'"
+  morph(query).first
 end
 
 get '/' do
@@ -37,17 +42,17 @@ get '/boxes' do
 end
 
 get '/boxes/:box_type.xml' do
-  url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
-  box = get_box(params[:box_type])
+  boxes_url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
+  box = get_box_type(params[:box_type])
   rss = RSS::Maker.make('atom') do |maker|
-    maker.channel.id = url
+    maker.channel.id = boxes_url
     maker.channel.author = 'Community Farm'
     maker.channel.updated = DateTime.parse(box.first['date']).iso8601
     maker.channel.title = box.first['title']
     box.each do |week|
       maker.items.new_item do |item|
         item.id = week['id']
-        item.link = url
+        item.link = url("/box/#{week['id']}")
         item.title = "#{week['title']} #{week['date']}"
         item.content.content = week['items'].gsub("\n", '<br>')
         item.updated = DateTime.parse(week['date']).iso8601
@@ -62,7 +67,7 @@ end
 
 get '/boxes/:box_type.json' do
   content_type :json
-  box = get_box(params[:box_type])
+  box = get_box_type(params[:box_type])
   box = box.map do |b|
     b['items'] = b['items'].split("\n")
     b
@@ -70,7 +75,21 @@ get '/boxes/:box_type.json' do
   box.to_json
 end
 
+get '/box/:id' do
+  @box = get_box(params[:id])
+  erb :box
+end
+
 __END__
 
 @@ index
 <a href="/boxes">List of box urls</a>
+
+@@ box
+<h1><%= @box['title'] %></h1>
+<h2><%= @box['date'] %></h2>
+<ul>
+  <% @box['items'].split("\n").each do |item| %>
+    <li><%= item %></li>
+  <% end %>
+</ul>
