@@ -26,6 +26,10 @@ def get_box(id)
   morph(query).first
 end
 
+before do
+  cache_control :public, :must_revalidate, :max_age => 60
+end
+
 get '/' do
   erb :index
 end
