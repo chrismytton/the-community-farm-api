@@ -5,10 +5,10 @@ require 'json'
 require 'date'
 require 'uri'
 
-def morph(sql, api_key=ENV['MORPH_API_KEY'])
+def morph(sql, scraper=ENV['MORPH_SCRAPER'], api_key=ENV['MORPH_API_KEY'])
   url = URI::HTTPS.build(
     host: 'api.morph.io',
-    path: '/hecticjeff/community-farm/data.json',
+    path: "/#{scraper}/data.json",
     query: URI.encode_www_form(query: sql, key: api_key)
   )
   JSON.parse(open(url).read)
@@ -58,7 +58,7 @@ get '/boxes/:box_type.xml' do
         item.id = week['id']
         item.link = url("/box/#{week['id']}")
         item.title = "#{week['title']} #{week['date']}"
-        item.content.content = week['items'].gsub("\n", '<br>')
+        item.content.content = JSON.parse(week['items']).join('<br>')
         item.updated = DateTime.parse(week['date']).iso8601
       end
     end
