@@ -73,7 +73,7 @@ get '/boxes/:box_type.json' do
   content_type :json
   box = get_box_type(params[:box_type])
   box = box.map do |b|
-    b['items'] = b['items'].split("\n")
+    b['items'] = JSON.parse(b['items'])
     b
   end
   box.to_json
