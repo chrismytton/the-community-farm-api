@@ -5,10 +5,10 @@ require 'json'
 require 'date'
 require 'uri'
 
-def morph(sql, scraper=ENV['MORPH_SCRAPER'], api_key=ENV['MORPH_API_KEY'])
+def morph(sql, api_key=ENV['MORPH_API_KEY'])
   url = URI::HTTPS.build(
     host: 'api.morph.io',
-    path: "/#{scraper}/data.json",
+    path: "/hecticjeff/the-community-farm-scraper/data.json",
     query: URI.encode_www_form(query: sql, key: api_key)
   )
   JSON.parse(open(url).read)
