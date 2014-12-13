@@ -17,7 +17,7 @@ end
 def add_urls_to_box(box)
   title = URI.encode_www_form_component(box['title'])
   box['html_url'] = url("/boxes/#{title}")
-  box['xml_url'] = url("/boxes/#{title}.xml")
+  box['atom_url'] = url("/boxes/#{title}.xml")
   box['json_url'] = url("/boxes/#{title}.json")
   box
 end
