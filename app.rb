@@ -22,7 +22,7 @@ def add_urls_to_box(box)
   box
 end
 
-def get_box_type(type)
+def box_type(type)
   box_type = URI.decode_www_form_component(type)
   query = "select * from 'data' where title = '#{box_type}'" \
     ' order by date desc limit 10'
@@ -33,7 +33,7 @@ def get_box_type(type)
   end.map(&method(:add_urls_to_box))
 end
 
-def get_all_boxes
+def all_boxes
   boxes = morph('select distinct title from data')
   boxes.map(&method(:add_urls_to_box))
 end
@@ -47,18 +47,18 @@ get '/' do
 end
 
 get '/boxes' do
-  @boxes = get_all_boxes
+  @boxes = all_boxes
   erb :index
 end
 
 get '/boxes.json' do
   content_type :json
-  JSON.pretty_generate(get_all_boxes)
+  JSON.pretty_generate(all_boxes)
 end
 
 get '/boxes/:box_type.xml' do
   boxes_url = 'http://www.thecommunityfarm.co.uk/boxes/box_display.php'
-  box = get_box_type(params[:box_type])
+  box = box_type(params[:box_type])
   rss = RSS::Maker.make('atom') do |maker|
     maker.channel.id = boxes_url
     maker.channel.author = 'Community Farm'
@@ -82,11 +82,11 @@ end
 
 get '/boxes/:box_type.json' do
   content_type :json
-  box = get_box_type(params[:box_type])
+  box = box_type(params[:box_type])
   JSON.pretty_generate(box)
 end
 
 get '/boxes/:box_type' do
-  @box = get_box_type(params[:box_type])
+  @box = box_type(params[:box_type])
   erb :box
 end
