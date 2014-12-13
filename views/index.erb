@@ -1,0 +1,9 @@
+<ul>
+<% @boxes.each do |box| %>
+  <li>
+    <a href="<%= box['html_url'] %>"><%= box['title'] %></a>
+    <small><a href="<%= box['json_url'] %>">JSON</a></small>
+    <small><a href="<%= box['xml_url'] %>">Atom</a></small>
+  </li>
+<% end %>
+</ul>
