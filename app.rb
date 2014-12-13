@@ -5,10 +5,10 @@ require 'json'
 require 'date'
 require 'uri'
 
-def morph(sql, api_key=ENV['MORPH_API_KEY'])
+def morph(sql, scraper = ENV['MORPH_SCRAPER'], api_key = ENV['MORPH_API_KEY'])
   url = URI::HTTPS.build(
     host: 'api.morph.io',
-    path: "/hecticjeff/the-community-farm-scraper/data.json",
+    path: "/#{scraper}/data.json",
     query: URI.encode_www_form(query: sql, key: api_key)
   )
   JSON.parse(open(url).read)
@@ -16,8 +16,8 @@ end
 
 def get_box_type(type)
   box_type = URI.decode_www_form_component(type)
-  query = "select * from 'data' where title = '#{box_type}'" +
-    " order by date desc limit 10"
+  query = "select * from 'data' where title = '#{box_type}'" \
+    ' order by date desc limit 10'
   morph(query)
 end
 
@@ -27,7 +27,7 @@ def get_box(id)
 end
 
 before do
-  cache_control :public, :must_revalidate, :max_age => 60
+  cache_control :public, :must_revalidate, max_age: 60
 end
 
 get '/' do
@@ -36,10 +36,11 @@ end
 
 get '/boxes' do
   content_type :json
-  boxes = morph("select distinct title from data")
+  boxes = morph('select distinct title from data')
   boxes_with_urls = boxes.map do |box|
-    box['xml_url'] = url("/boxes/#{URI.encode_www_form_component(box['title'])}.xml")
-    box['json_url'] = url("/boxes/#{URI.encode_www_form_component(box['title'])}.json")
+    title = URI.encode_www_form_component(box['title'])
+    box['xml_url'] = url("/boxes/#{title}.xml")
+    box['json_url'] = url("/boxes/#{title}.json")
     box
   end
   boxes_with_urls.to_json
