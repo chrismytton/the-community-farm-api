@@ -1,0 +1,10 @@
+web:
+  build: .
+  ports:
+    - "9292:9292"
+  volumes:
+    - .:/usr/src/app
+  environment:
+    # These will be picked up from the current environment
+    - MORPH_API_KEY
+    - MORPH_SCRAPER
