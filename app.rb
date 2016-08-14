@@ -17,6 +17,10 @@ def morph(sql, scraper = ENV['MORPH_SCRAPER'], api_key = ENV['MORPH_API_KEY'])
   JSON.parse(url.open.read)
 end
 
+def quote_string(s)
+  s.gsub('\\'.freeze, '\&\&'.freeze).gsub("'".freeze, "''".freeze) # ' (for ruby-mode)
+end
+
 def add_urls_to_box(box)
   title = URI.encode_www_form_component(box['title'])
   box['html_url'] = url("/boxes/#{title}")
@@ -27,7 +31,7 @@ end
 
 def box_type(type)
   box_type = URI.decode_www_form_component(type)
-  query = "select * from 'data' where title = '#{box_type}'" \
+  query = "select * from 'data' where title = '#{quote_string(box_type)}'" \
     ' order by date desc limit 10'
   boxes = morph(query)
   boxes.map do |box|
