@@ -1,4 +1,4 @@
-<h1><%= @box.first['title'] %></h1>
+<h1><%= @title %></h1>
 <% @box.each do |week| %>
   <h2><%= Date.parse(week['date']).strftime('%a %d %b %Y') %></h2>
   <ul>

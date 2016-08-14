@@ -95,5 +95,6 @@ end
 
 get '/boxes/:box_type' do
   @box = box_type(params[:box_type])
+  @title = @box.first['title']
   erb :box
 end
