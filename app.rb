@@ -5,6 +5,8 @@ require 'open-uri'
 require 'json'
 require 'date'
 require 'uri'
+require 'dotenv'
+Dotenv.load
 
 def morph(sql, scraper = ENV['MORPH_SCRAPER'], api_key = ENV['MORPH_API_KEY'])
   url = URI::HTTPS.build(
